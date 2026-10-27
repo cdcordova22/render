@@ -21,7 +21,7 @@ def analizar_inspeccion():
         img = Image.open(temp_path)
         
         # Usamos el modelo estándar actual
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-3.8-flash')
         
         prompt = "Analiza esta hoja de inspección manuscrita de camarón HLSO. Extrae toda la información de la cabecera (Exportador, Lugar, Fecha, Presentación, Orden) y todas las filas de la tabla de muestreo (Talla, Lote, Fecha Prod, Pesos Brutos, Pesos Netos, Unidades/Lb, Uniformidad, Factor, Defectos y Temperatura). Devuelve EXCLUSIVAMENTE un objeto JSON válido, sin bloques de código markdown, con la estructura exacta: {\"cabecera\": {...}, \"muestras\": [...]}"
         
