@@ -20,10 +20,9 @@ def analizar_inspeccion():
         
         img = Image.open(temp_path)
         
-        # Usamos el modelo estándar actual
-        model = genai.GenerativeModel('gemini-3.8-flash')
+        model = genai.GenerativeModel('gemini-1.5-flash')
         
-        prompt = "Analiza esta hoja de inspección manuscrita de camarón HLSO. Extrae toda la información de la cabecera (Exportador, Lugar, Fecha, Presentación, Orden) y todas las filas de la tabla de muestreo (Talla, Lote, Fecha Prod, Pesos Brutos, Pesos Netos, Unidades/Lb, Uniformidad, Factor, Defectos y Temperatura). Devuelve EXCLUSIVAMENTE un objeto JSON válido, sin bloques de código markdown, con la estructura exacta: {\"cabecera\": {...}, \"muestras\": [...]}"
+        prompt = "Analiza esta hoja de inspección manuscrita de camarón HLSO. Extrae toda la información de la cabecera y la tabla. Devuelve EXCLUSIVAMENTE un objeto JSON válido, sin bloques de código markdown, con la estructura exacta: {\"cabecera\": {...}, \"muestras\": [...]}"
         
         response = model.generate_content([img, prompt])
         raw_text = response.text.strip()
@@ -41,8 +40,12 @@ def analizar_inspeccion():
         return jsonify({'success': True, 'data': json_data})
         
     except Exception as e:
-        # Esto capturará cualquier error interno y te dirá exactamente qué falló en Python
-        return jsonify({'success': False, 'error': 'Excepción interna en Python: ' . str(e)}), 500
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+        # AQUÍ ESTÁ EL TRUCO: Devolvemos la excepción completa como texto en el JSON
+        import traceback
+        error_detallado = traceback.format_exc()
+        return jsonify({
+            'success': False, 
+            'error': 'Error interno en Python', 
+            'detalle_excepcion': str(e),
+            'traza': error_detallado
+        }), 200  # <--- Usamos HTTP 200 temporalmente para que PHP pueda leer el JSON de error con claridad
